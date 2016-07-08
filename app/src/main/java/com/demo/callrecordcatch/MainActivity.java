@@ -58,18 +58,18 @@ public class MainActivity extends AppCompatActivity {
 
     public void getCallLog() {
 
-        int hasWriteContactsPermission = ActivityCompat.checkSelfPermission(this,Manifest.permission.READ_CALL_LOG);
+        int hasWriteContactsPermission = ActivityCompat.checkSelfPermission(this,CALLLOG_PERMISSION);
         if (hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) {
             if (Build.VERSION.SDK_INT >= 23) {
-                requestPermissions(new String[] {Manifest.permission.READ_CALL_LOG},
+                requestPermissions(new String[] {CALLLOG_PERMISSION},
                         readCallLogRequest);
             }else{
 
             }
-            catchCallData();
+
             return;
         }
-
+        catchCallData();
 
     }
     private void catchCallData() {
