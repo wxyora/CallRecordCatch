@@ -31,8 +31,6 @@ public class BaseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         x.view().inject(this);
-        loadingDialog = LoadingDialogUtil.createLoadingDialog(this, "数据加载中……");
-
         int hasWriteContactsPermission = ActivityCompat.checkSelfPermission(this,CALLLOG_PERMISSION);
         if (hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) {
             if (Build.VERSION.SDK_INT >= 23) {
