@@ -23,7 +23,7 @@
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="获取通讯录"
+                android:text="获取通话记录"
                 android:id="@+id/catch_call_record" />
         </LinearLayout>
 

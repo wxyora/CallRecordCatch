@@ -1,15 +1,8 @@
 package com.demo.callrecordcatch;
 
-import android.Manifest;
-import android.content.ContentResolver;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.CallLog;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -17,19 +10,15 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.security.spec.ECField;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     private Button catch_call_record;
-
     private static List<CallLogInfo> callLogList = new ArrayList<CallLogInfo>();
-    private static final String CALLLOG_PERMISSION = android.Manifest.permission.READ_CALL_LOG;
-    private static final int readCallLogRequest = 2;
     private ListView listView;
     private CallLogAdapter adapter;
 
@@ -37,52 +26,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-         listView = (ListView) findViewById(R.id.listView);
-         adapter = new CallLogAdapter(callLogList,this);
-         listView.setAdapter(adapter);
-
+        listView = (ListView) findViewById(R.id.listView);
+        adapter = new CallLogAdapter(callLogList,this);
+        listView.setAdapter(adapter);
         catch_call_record = (Button) findViewById(R.id.catch_call_record);
         catch_call_record.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getCallLog();
+                catchCallData();
                 adapter.notifyDataSetChanged();
-
             }
         });
-
-
-
-
     }
 
-    public void getCallLog() {
-
-        int hasWriteContactsPermission = ActivityCompat.checkSelfPermission(this,CALLLOG_PERMISSION);
-        if (hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) {
-            if (Build.VERSION.SDK_INT >= 23) {
-                requestPermissions(new String[] {CALLLOG_PERMISSION},
-                        readCallLogRequest);
-            }else{
-
-            }
-
-            return;
-        }
-        catchCallData();
-
-    }
     private void catchCallData() {
-        callLogList.removeAll(callLogList);
-        Uri callLogUri = CallLog.Calls.CONTENT_URI;
-        String[] projection = {CallLog.Calls.CACHED_NAME, CallLog.Calls.NUMBER,
-                CallLog.Calls.TYPE, CallLog.Calls.DURATION, CallLog.Calls.DATE};
-        Cursor cursor = null;
-        try{
-             cursor = MyApplication.getContext().getContentResolver().query(callLogUri, projection, null, null, CallLog.Calls.DEFAULT_SORT_ORDER);
-        }catch (Exception e){
-
-        }
 
         String callLogName;
         String callLogNumber;
@@ -92,39 +49,53 @@ public class MainActivity extends AppCompatActivity {
         String type;
         String time;
 
+        callLogList.clear();
+        Uri callLogUri = CallLog.Calls.CONTENT_URI;
+        String[] projection = {CallLog.Calls.CACHED_NAME, CallLog.Calls.NUMBER,
+                CallLog.Calls.TYPE, CallLog.Calls.DURATION, CallLog.Calls.DATE};
+        Cursor cursor = null;
+        try{
+             cursor = MyApplication.getContext().getContentResolver().query(callLogUri, projection, null, null, CallLog.Calls.DEFAULT_SORT_ORDER);
+        }catch (Exception e){
 
-        while (cursor.moveToNext()){
-            callLogName = cursor.getString(cursor.getColumnIndex(CallLog.Calls.CACHED_NAME));
-            if (callLogName==null){
-                callLogName = "未知号码";
-            }
-            callLogNumber = cursor.getString(cursor.getColumnIndex(CallLog.Calls.NUMBER));
-
-            callLogDate = cursor.getString(cursor.getColumnIndex(CallLog.Calls.DATE));
-            SimpleDateFormat DateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-            Date d = new Date(Long.parseLong(callLogDate));
-            callLogDate = DateFormat.format(d);
-
-            callLogType =cursor.getInt(cursor.getColumnIndex(CallLog.Calls.TYPE));
-            if (callLogType == 1){
-                type ="来电";
-            }else if (callLogType ==2){
-                type = "拨出";
-            }else
-                type = "未接";
-
-            callLogTime = cursor.getInt(cursor.getColumnIndex(CallLog.Calls.DURATION));
-            if (type =="未接"){
-                time ="未接";
-            }else {
-                time = timeChange(callLogTime);
-            }
-
-            CallLogInfo callLogInfo = new CallLogInfo(callLogName,callLogNumber
-                    ,callLogDate,callLogType,time);
-            callLogList.add(callLogInfo);
-            Log.d("输出",callLogDate + callLogName + callLogNumber + callLogTime + callLogType);
         }
+        if(cursor.getCount()!=0){
+            while (cursor.moveToNext()){
+                callLogName = cursor.getString(cursor.getColumnIndex(CallLog.Calls.CACHED_NAME));
+                if (callLogName==null){
+                    callLogName = "未知号码";
+                }
+                callLogNumber = cursor.getString(cursor.getColumnIndex(CallLog.Calls.NUMBER));
+                callLogDate = cursor.getString(cursor.getColumnIndex(CallLog.Calls.DATE));
+                SimpleDateFormat DateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                Date d = new Date(Long.parseLong(callLogDate));
+                callLogDate = DateFormat.format(d);
+
+                callLogType =cursor.getInt(cursor.getColumnIndex(CallLog.Calls.TYPE));
+                if (callLogType == 1){
+                    type ="来电";
+                }else if (callLogType ==2){
+                    type = "拨出";
+                }else
+                    type = "未接";
+
+                callLogTime = cursor.getInt(cursor.getColumnIndex(CallLog.Calls.DURATION));
+                if (type =="未接"){
+                    time ="未接";
+                }else {
+                    time = timeChange(callLogTime);
+                }
+
+                CallLogInfo callLogInfo = new CallLogInfo(callLogName,callLogNumber
+                        ,callLogDate,callLogType,time);
+                callLogList.add(callLogInfo);
+                Log.d("输出",callLogDate + callLogName + callLogNumber + callLogTime + callLogType);
+            }
+        }else{
+            Toast.makeText(this,"请检查通话记录是否授权!",Toast.LENGTH_SHORT).show();
+        }
+
+
         cursor.close();
     }
 

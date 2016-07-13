@@ -2,6 +2,7 @@ package com.demo.callrecordcatch;
 
 
 import android.content.Context;
+import android.provider.CallLog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,26 +43,26 @@ public class CallLogAdapter extends BaseAdapter {
         if (convertView ==null){
             convertView = LayoutInflater.from(context).inflate(R.layout.list_view_item,null);
             holder = new ViewHolder();
-            //holder.call_type = (ImageView) convertView.findViewById(R.id.call_type);
-            //holder.name = (TextView) convertView.findViewById(R.id.call_name);
-            holder.number = (TextView) convertView.findViewById(R.id.number);
-            //holder.date = (TextView) convertView.findViewById(R.id.call_date);
-            //holder.time = (TextView) convertView.findViewById(R.id.call_time);
+            //holder.call_type = (TextView) convertView.findViewById(R.id.call_type);
+            holder.name = (TextView) convertView.findViewById(R.id.call_name);
+            holder.number = (TextView) convertView.findViewById(R.id.call_number);
+            holder.date = (TextView) convertView.findViewById(R.id.call_date);
+            holder.time = (TextView) convertView.findViewById(R.id.call_time);
 
-            //setType(callLog.getType(),holder);
-            //holder.name.setText(callLog.getName());
-            holder.number.setText(callLog.getNumber());
-            //holder.date.setText(callLog.getDate());
-            //holder.time.setText(callLog.getTime());
+            setType(callLog,holder);
+            holder.name.setText(callLog.getName());
+            //holder.number.setText(callLog.getNumber());
+            holder.date.setText(callLog.getDate());
+            holder.time.setText(callLog.getTime());
 
             convertView.setTag(holder);
         }else {
             holder = (ViewHolder) convertView.getTag();
-            //setType(callLog.getType(),holder);
-            //holder.name.setText(callLog.getName());
-            holder.number.setText(callLog.getNumber());
-            //holder.date.setText(callLog.getDate());
-            //holder.time.setText(callLog.getTime());
+            setType(callLog,holder);
+            holder.name.setText(callLog.getName());
+            //holder.number.setText(callLog.getNumber());
+            holder.date.setText(callLog.getDate());
+            holder.time.setText(callLog.getTime());
 
         }
 
@@ -71,22 +72,25 @@ public class CallLogAdapter extends BaseAdapter {
 
 
     private static class ViewHolder{
-        ImageView call_type;
+        TextView call_type;
         TextView name;
         TextView number;
         TextView date;
         TextView time;
     }
-    private void setType(int callLog,ViewHolder holder){
-        switch (callLog) {
+    private void setType(CallLogInfo callLog, ViewHolder holder){
+        switch (callLog.getType()) {
             case 1:
                 //holder.call_type.setBackgroundResource(R.drawable.laidian);
+                holder.number.setText("来电-"+callLog.getNumber());
                 break;
             case 2:
                 //holder.call_type.setBackgroundResource(R.drawable.bochu);
+                holder.number.setText("拨出-"+callLog.getNumber());
                 break;
             case 3:
                 //holder.call_type.setBackgroundResource(R.drawable.weijie);
+                holder.number.setText("未接-"+callLog.getNumber());
                 break;
         }
 
